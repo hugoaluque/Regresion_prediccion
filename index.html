@@ -565,23 +565,89 @@
       box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
     }
 
-    .preset-bar {
+    .field input:disabled {
+      background: var(--bg-subtle);
+      color: var(--text-light);
+      border-color: var(--border-color);
+      cursor: not-allowed;
+    }
+
+    /* Interruptor explícito de predicción puntual X0 */
+    .pred-toggle-box {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      padding: 0.65rem 0.75rem;
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 0.48rem;
+    }
+
+    .toggle-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.79rem;
+      font-weight: 700;
+      color: var(--slate-800);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-label input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--hydro-700);
+      cursor: pointer;
+    }
+
+    .status-pill {
+      font-size: 0.69rem;
+      font-weight: 700;
+      padding: 0.14rem 0.5rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .status-pill.interp {
+      background: var(--forest-100);
+      color: var(--forest-800);
+    }
+
+    .status-pill.extrap {
+      background: var(--amber-50);
+      color: var(--amber-900);
+      border: 1px solid var(--amber-200);
+    }
+
+    .status-pill.off {
+      background: var(--bg-subtle);
+      color: var(--text-light);
+    }
+
+    .preset-bar {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 0.4rem;
     }
 
     .btn-preset {
-      flex: 1;
-      min-width: 95px;
       background: #ffffff;
       border: 1px solid #cbd5e1;
       color: var(--slate-800);
       border-radius: 6px;
-      padding: 0.36rem 0.5rem;
-      font-size: 0.75rem;
+      padding: 0.4rem 0.5rem;
+      font-size: 0.74rem;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.15s ease;
     }
 
     .btn-preset:hover {
@@ -1261,7 +1327,7 @@
         <span class="section-kicker">Sección 04 &bull; Laboratorio Computacional en Tiempo Real</span>
         <h2>Simulador Interactivo de Regresión, Diagnóstico de Residuos y Predicción</h2>
         <p>
-          Edita directamente los pares (<span class="math-var">X</span>, <span class="math-var">Y</span>), cambia entre modelos lineales y no lineales para observar cómo varían <span class="math-var">R</span><sup>2</sup>, el RMSE y el patrón de residuos (<span class="math-var">e</span><sub><i>i</i></sub> = <span class="math-var">y</span><sub><i>i</i></sub> &minus; <span class="math-hat">y</span><sub><i>i</i></sub>), y simula predicciones para nuevos valores <span class="math-var">X</span><sub>0</sub>.
+          Edita directamente los pares (<span class="math-var">X</span>, <span class="math-var">Y</span>), cambia entre modelos lineales y no lineales para observar cómo varían <span class="math-var">R</span><sup>2</sup>, el RMSE y el patrón de residuos (<span class="math-var">e</span><sub><i>i</i></sub> = <span class="math-var">y</span><sub><i>i</i></sub> &minus; <span class="math-hat">y</span><sub><i>i</i></sub>), y activa o desactiva la predicción puntual (<span class="math-var">X</span><sub>0</sub>) según lo necesites.
         </p>
       </div>
 
@@ -1273,9 +1339,10 @@
             <div>
               <label style="display: block; font-size: 0.76rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">Presets Ambientales / Forestales:</label>
               <div class="preset-bar">
-                <button type="button" class="btn-preset" onclick="loadRegressionPreset('hidro_sst')">1. Aforo-SST</button>
-                <button type="button" class="btn-preset" onclick="loadRegressionPreset('forest_agb')">2. Biomasa DAP</button>
-                <button type="button" class="btn-preset" onclick="loadRegressionPreset('wetland_temp')">3. Curva DBO<sub>5</sub></button>
+                <button type="button" class="btn-preset" onclick="loadRegressionPreset('hidro_sst')">1. Aforo-SST (Lineal)</button>
+                <button type="button" class="btn-preset" onclick="loadRegressionPreset('forest_agb')">2. Biomasa (Alométrica)</button>
+                <button type="button" class="btn-preset" onclick="loadRegressionPreset('wetland_temp')">3. DBO<sub>5</sub> (Cuadrática)</button>
+                <button type="button" class="btn-preset" onclick="loadRegressionPreset('coliformes_exp')">4. Coliformes (Exp.)</button>
               </div>
             </div>
 
@@ -1289,9 +1356,18 @@
               </select>
             </div>
 
-            <div class="field">
-              <label for="reg-pred-x">Nuevo valor para predicción (<span class="math-var">X</span><sub>0</sub>)</label>
-              <input id="reg-pred-x" type="number" step="any" value="18.5" />
+            <!-- Interruptor explícito de Predicción Puntual X0 -->
+            <div class="pred-toggle-box">
+              <div class="toggle-header">
+                <label class="toggle-label" for="reg-enable-pred">
+                  <input id="reg-enable-pred" type="checkbox" checked />
+                  <span>Activar predicción puntual (<span class="math-var">X</span><sub>0</sub>)</span>
+                </label>
+                <span id="pred-mode-badge" class="status-pill extrap">Extrapolación</span>
+              </div>
+              <div class="field" style="margin: 0;">
+                <input id="reg-pred-x" type="number" step="any" value="18.5" aria-label="Nuevo valor para predicción X0" />
+              </div>
             </div>
 
             <div class="field">
@@ -1339,7 +1415,7 @@
                 <div class="m-label">MAE</div>
                 <div id="m-mae" class="m-val">6.182</div>
               </div>
-              <div class="m-card pred">
+              <div class="m-card pred" id="m-pred-card">
                 <div class="m-label">Predicción <span class="math-hat">y</span>(<span class="math-var">X</span><sub>0</sub>)</div>
                 <div id="m-pred" class="m-val">336.13</div>
               </div>
@@ -1350,19 +1426,21 @@
             </div>
 
             <div class="charts-stack">
-              <!-- Gráfico 1: Dispersión + Curva Ajustada + Predicción -->
+              <!-- Gráfico 1: Dispersión + Curva Ajustada + Banda 95% + Predicción -->
               <div class="svg-box">
                 <div class="svg-header">
-                  <strong id="chart1-title" style="color: var(--slate-900);">Ajuste del Modelo y Predicción Puntual</strong>
+                  <strong id="chart1-title" style="color: var(--slate-900);">Ajuste del Modelo, Banda 95% y Predicción Puntual</strong>
                   <div class="legend-row">
                     <span><i class="dot-swatch" style="background: #0369a1;"></i>Observado (x<sub>i</sub>, y<sub>i</sub>)</span>
                     <span><i class="dot-swatch" style="background: #15803d; border-radius: 2px;"></i>Curva ajustada</span>
-                    <span><i class="dot-swatch" style="background: #dc2626;"></i>Predicción (X<sub>0</sub>, ŷ<sub>0</sub>)</span>
+                    <span><i class="dot-swatch" style="background: rgba(21, 128, 61, 0.22); border-radius: 2px;"></i>Banda 95%</span>
+                    <span id="legend-pred-item"><i class="dot-swatch" style="background: #dc2626;"></i>Predicción (X<sub>0</sub>, ŷ<sub>0</sub>)</span>
                   </div>
                 </div>
                 <svg id="svgFit" viewBox="0 0 680 285" style="width: 100%; height: auto; display: block;" role="img" aria-label="Gráfico de dispersión y curva de regresión ajustada">
                   <rect x="52" y="18" width="608" height="222" fill="#ffffff" rx="6" stroke="#e2e8f0" stroke-width="1" />
                   <g id="fit-grid"></g>
+                  <path id="fit-band" d="" fill="rgba(21, 128, 61, 0.11)" stroke="none" />
                   <g id="fit-residuals"></g>
                   <path id="fit-curve" d="" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round" />
                   <g id="fit-points"></g>
@@ -1695,6 +1773,13 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
         xLabel: 'Temperatura (°C)',
         yLabel: 'Remoción DBO5 (%)',
         data: `6.0, 50.8\n8.5, 63.1\n11.0, 72.9\n13.5, 80.4\n16.0, 86.2\n18.5, 89.5\n20.5, 91.2\n23.0, 90.6\n25.5, 88.1\n28.0, 83.8\n30.0, 78.9\n32.0, 72.4`
+      },
+      coliformes_exp: {
+        model: 'exp',
+        predX: 4.5,
+        xLabel: 'Distancia Aguas Abajo (km)',
+        yLabel: 'Coliformes (NMP/100 mL)',
+        data: `0, 4800\n1, 3150\n2, 2080\n3, 1360\n4, 890\n5, 585\n6, 380\n7, 250\n8, 165\n9, 108`
       }
     };
 
@@ -1705,6 +1790,8 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
       const p = PRESETS[key];
       if (!p) return;
       document.getElementById('reg-model').value = p.model;
+      document.getElementById('reg-enable-pred').checked = true;
+      document.getElementById('reg-pred-x').disabled = false;
       document.getElementById('reg-pred-x').value = p.predX;
       document.getElementById('reg-data').value = p.data;
       currentXLabel = p.xLabel;
@@ -1791,7 +1878,11 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
 
     function runRegressionLab() {
       const modelType = document.getElementById('reg-model').value;
-      const predXRaw = parseFloat(document.getElementById('reg-pred-x').value);
+      const enablePred = document.getElementById('reg-enable-pred').checked;
+      const predInputEl = document.getElementById('reg-pred-x');
+      predInputEl.disabled = !enablePred;
+
+      const predXRaw = parseFloat(predInputEl.value);
       const pts = parseDataPairs(document.getElementById('reg-data').value);
       const statusEl = document.getElementById('reg-status');
 
@@ -1803,11 +1894,13 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
       const n = pts.length;
       const xs = pts.map(p => p.x);
       const ys = pts.map(p => p.y);
-      const predX = isNaN(predXRaw) ? xs[xs.length - 1] : predXRaw;
+      const minObsX = Math.min(...xs);
+      const maxObsX = Math.max(...xs);
+      const predX = isNaN(predXRaw) ? maxObsX : predXRaw;
 
       let predictFn = (x) => 0;
       let eqHTML = '';
-      let kParams = 1; // número de predictores efectivos para R2 ajustado
+      let kParams = 1;
       let validModel = true;
 
       if (modelType === 'linear') {
@@ -1867,7 +1960,7 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
 
       if (!validModel) return;
 
-      statusEl.innerHTML = `<strong><span class="math-var">n</span> = ${n}</strong> observaciones calibradas. Rango X: [${Math.min(...xs)}, ${Math.max(...xs)}].`;
+      statusEl.innerHTML = `<strong><span class="math-var">n</span> = ${n}</strong> observaciones calibradas. Rango X: [${minObsX}, ${maxObsX}].`;
 
       // Cálculo de valores ajustados, residuos y métricas en escala original
       const yHats = xs.map(x => predictFn(x));
@@ -1887,8 +1980,6 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
       const rmse = Math.sqrt(ssRes / n);
       const mae = absErr / n;
       const seReg = n > (kParams + 1) ? Math.sqrt(ssRes / (n - kParams - 1)) : rmse;
-
-      const predY = predictFn(predX);
       const margin95 = 2.0 * seReg;
 
       document.getElementById('reg-eq-output').innerHTML = eqHTML;
@@ -1896,21 +1987,55 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
       document.getElementById('m-r2adj').textContent = r2Adj.toFixed(4);
       document.getElementById('m-rmse').textContent = rmse.toFixed(3);
       document.getElementById('m-mae').textContent = mae.toFixed(3);
-      document.getElementById('m-pred').textContent = predY.toFixed(2);
 
-      document.getElementById('pred-interval-note').innerHTML =
-        `Para <strong>X<sub>0</sub> = ${predX}</strong>, el valor predicho es <strong>ŷ<sub>0</sub> = ${predY.toFixed(2)}</strong> &nbsp;|&nbsp; Banda de predicción aprox. 95%: <strong>[${(predY - margin95).toFixed(2)}, ${(predY + margin95).toFixed(2)}]</strong>.`;
+      const badgeEl = document.getElementById('pred-mode-badge');
+      const predCardEl = document.getElementById('m-pred-card');
+      const predValEl = document.getElementById('m-pred');
+      const noteEl = document.getElementById('pred-interval-note');
+      const legendPredEl = document.getElementById('legend-pred-item');
 
-      renderFitSVG(pts, yHats, resids, predictFn, predX, predY, modelType);
+      let predY = null;
+      if (!enablePred) {
+        badgeEl.textContent = 'Desactivada';
+        badgeEl.className = 'status-pill off';
+        predCardEl.style.opacity = '0.65';
+        predValEl.textContent = '—';
+        legendPredEl.style.display = 'none';
+        noteEl.style.background = 'var(--bg-subtle)';
+        noteEl.style.borderColor = 'var(--border-color)';
+        noteEl.innerHTML = '<strong>Desactivada (solo ajuste):</strong> Se evalúa únicamente la ecuación y la bondad de ajuste sobre los datos observados sin proyectar un escenario X<sub>0</sub>.';
+      } else {
+        predY = predictFn(predX);
+        const isExtrapolation = predX < minObsX || predX > maxObsX;
+        badgeEl.textContent = isExtrapolation ? 'Extrapolación' : 'Interpolación';
+        badgeEl.className = isExtrapolation ? 'status-pill extrap' : 'status-pill interp';
+        predCardEl.style.opacity = '1';
+        predValEl.textContent = predY.toFixed(2);
+        legendPredEl.style.display = 'inline-block';
+
+        if (isExtrapolation) {
+          noteEl.style.background = 'var(--amber-50)';
+          noteEl.style.borderColor = 'var(--amber-200)';
+          noteEl.innerHTML = `<strong>Advertencia de extrapolación:</strong> <strong>X<sub>0</sub> = ${predX}</strong> está fuera del rango calibrado [${minObsX}, ${maxObsX}]. Predicción puntual: <strong>ŷ<sub>0</sub> = ${predY.toFixed(2)}</strong> &nbsp;|&nbsp; Banda 95%: <strong>[${(predY - margin95).toFixed(2)}, ${(predY + margin95).toFixed(2)}]</strong>.`;
+        } else {
+          noteEl.style.background = 'var(--forest-50)';
+          noteEl.style.borderColor = 'var(--forest-200)';
+          noteEl.innerHTML = `Para <strong>X<sub>0</sub> = ${predX}</strong> (interpolación), el valor predicho es <strong>ŷ<sub>0</sub> = ${predY.toFixed(2)}</strong> &nbsp;|&nbsp; Banda de predicción aprox. 95%: <strong>[${(predY - margin95).toFixed(2)}, ${(predY + margin95).toFixed(2)}]</strong>.`;
+        }
+      }
+
+      renderFitSVG(pts, yHats, resids, predictFn, enablePred, predX, predY, margin95, modelType);
       renderResidSVG(yHats, resids);
     }
 
-    function renderFitSVG(pts, yHats, resids, predictFn, predX, predY, modelType) {
+    function renderFitSVG(pts, yHats, resids, predictFn, enablePred, predX, predY, margin95, modelType) {
       const leftX = 52, rightX = 660, topY = 18, botY = 240;
       const W = rightX - leftX, H = botY - topY;
 
-      const allX = [...pts.map(p => p.x), predX];
-      const allY = [...pts.map(p => p.y), ...yHats, predY];
+      const allX = enablePred ? [...pts.map(p => p.x), predX] : pts.map(p => p.x);
+      const allY = enablePred
+        ? [...pts.map(p => p.y), ...yHats, predY + margin95, predY - margin95]
+        : [...pts.map(p => p.y), ...yHats.map(v => v + margin95), ...yHats.map(v => v - margin95)];
 
       let minX = Math.min(...allX), maxX = Math.max(...allX);
       let minY = Math.min(...allY), maxY = Math.max(...allY);
@@ -1943,11 +2068,13 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
         axesG.innerHTML += `<text x="${leftX - 6}" y="${(py + 3.5).toFixed(1)}" text-anchor="end" fill="#475569" font-size="10.5" font-family="monospace">${formatShort(yv, maxY - minY)}</text>`;
       }
 
-      // Etiquetas de ejes
+      // Etiqueta de eje X
       axesG.innerHTML += `<text x="${(leftX + rightX) / 2}" y="276" text-anchor="middle" fill="#1e293b" font-size="11" font-weight="700">${currentXLabel}</text>`;
 
-      // Curva ajustada
+      // Curva ajustada + Banda de predicción al 95%
       let dCurve = '';
+      const upperPts = [];
+      const lowerPts = [];
       const steps = 160;
       for (let i = 0; i <= steps; i++) {
         const xv = minX + (i / steps) * (maxX - minX);
@@ -1955,9 +2082,15 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
         if (!isFinite(yv)) continue;
         const sx = toX(xv).toFixed(2);
         const sy = Math.max(topY, Math.min(botY, toY(yv))).toFixed(2);
+        const syUp = Math.max(topY, Math.min(botY, toY(yv + margin95))).toFixed(2);
+        const syLo = Math.max(topY, Math.min(botY, toY(yv - margin95))).toFixed(2);
         dCurve += (dCurve === '' ? `M ${sx} ${sy}` : ` L ${sx} ${sy}`);
+        upperPts.push(`${sx} ${syUp}`);
+        lowerPts.unshift(`${sx} ${syLo}`);
       }
       document.getElementById('fit-curve').setAttribute('d', dCurve);
+      const bandD = upperPts.length > 1 ? `M ${upperPts.join(' L ')} L ${lowerPts.join(' L ')} Z` : '';
+      document.getElementById('fit-band').setAttribute('d', bandD);
 
       // Líneas verticales de residuos y puntos observados
       const resG = document.getElementById('fit-residuals');
@@ -1973,8 +2106,13 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
         ptsG.innerHTML += `<circle cx="${cx}" cy="${cyObs}" r="4.3" fill="#0369a1" stroke="#ffffff" stroke-width="1.3" />`;
       });
 
-      // Marcador de predicción (X0, Y0_hat)
+      // Marcador de predicción (X0, Y0_hat) solo si está activado
       const predG = document.getElementById('fit-pred-marker');
+      if (!enablePred || predY === null || !isFinite(predY)) {
+        predG.innerHTML = '';
+        return;
+      }
+
       const px0 = toX(predX);
       const py0 = Math.max(topY, Math.min(botY, toY(predY)));
       const anchor = px0 > rightX - 110 ? 'end' : 'start';
@@ -2054,6 +2192,7 @@ print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}"
     ['reg-model', 'reg-pred-x', 'reg-data'].forEach(id => {
       document.getElementById(id).addEventListener('input', runRegressionLab);
     });
+    document.getElementById('reg-enable-pred').addEventListener('change', runRegressionLab);
 
     window.addEventListener('DOMContentLoaded', () => {
       currentXLabel = PRESETS.hidro_sst.xLabel;
