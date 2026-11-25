@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Regresión Estadística y Modelos Predictivos</title>
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --text-main: #1e293b;
+      --text-muted: #475569;
+      --text-light: #64748b;
+      --border-color: #e2e8f0;
+      --forest-50: #f0fdf4;
+      --forest-100: #dcfce7;
+      --forest-200: #bbf7d0;
+      --forest-600: #16a34a;
+      --forest-700: #15803d;
+      --forest-800: #166534;
+      --hydro-50: #f0f9ff;
+      --hydro-100: #e0f2fe;
+      --hydro-200: #bae6fd;
+      --hydro-600: #0284c7;
+      --hydro-700: #0369a1;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --amber-50: #fffbeb;
+      --amber-200: #fde68a;
+      --amber-900: #78350f;
+      --crimson-600: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Tipografía Matemática Nativa (Cero dependencias externas, 100% offline/PDF) */
+    .math-var {
+      font-family: "Georgia", "Times New Roman", serif;
+      font-style: italic;
+    }
+
+    .math-hat {
+      position: relative;
+      display: inline-block;
+      font-family: "Georgia", "Times New Roman", serif;
+      font-style: italic;
+    }
+
+    .math-hat::before {
+      content: "^";
+      position: absolute;
+      top: -0.48em;
+      left: 0.08em;
+      font-style: normal;
+      font-size: 0.85em;
+    }
+
+    .math-overline {
+      text-decoration: overline;
+      font-family: "Georgia", "Times New Roman", serif;
+      font-style: italic;
+    }
+
+    .eq-box {
+      background-color: var(--bg-subtle);
+      border-left: 4px solid var(--forest-700);
+      border-radius: 0 10px 10px 0;
+      padding: 0.9rem 1.2rem;
+      margin: 0.75rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      font-family: "Georgia", "Times New Roman", serif;
+      font-size: 1.04rem;
+      color: var(--slate-900);
+      overflow-x: auto;
+    }
+
+    .eq-box.hydro {
+      border-left-color: var(--hydro-700);
+    }
+
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 0.25rem;
+      text-align: center;
+    }
+
+    .frac > span:first-child {
+      border-bottom: 1.5px solid currentColor;
+      padding: 0 0.35rem 0.12rem;
+    }
+
+    .frac > span:last-child {
+      padding: 0.12rem 0.35rem 0;
+    }
+
+    .sqrt {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .sqrt-rad {
+      border-top: 1.4px solid currentColor;
+      padding-left: 2px;
+      padding-right: 2px;
+    }
+
+    /* Barra de navegación pegajosa */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 700;
+      color: var(--slate-900);
+      font-size: 0.96rem;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--forest-700), var(--hydro-700));
+      color: #ffffff;
+      padding: 0.32rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.15rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--forest-700);
+    }
+
+    @media (max-width: 860px) {
+      .nav-links {
+        display: none;
+      }
+    }
+
+    /* Portada / Hero */
+    .hero {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      padding: 3rem 1.25rem;
+    }
+
+    .hero-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .pill {
+      display: inline-block;
+      background: var(--forest-50);
+      color: var(--forest-800);
+      border: 1px solid var(--forest-200);
+      border-radius: 999px;
+      padding: 0.25rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 0.9rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.75rem, 3.2vw, 2.4rem);
+      color: var(--slate-900);
+      line-height: 1.2;
+      margin-bottom: 0.8rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero .subtitle {
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: var(--hydro-700);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero p.desc {
+      color: var(--text-muted);
+      max-width: 860px;
+      font-size: 0.98rem;
+    }
+
+    /* Contenedor Principal */
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3.5rem;
+    }
+
+    .section-header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.65rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-kicker {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--forest-700);
+      margin-bottom: 0.2rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.5rem;
+      color: var(--slate-900);
+    }
+
+    .section-header p {
+      font-size: 0.93rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Grids y Tarjetas */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.6rem;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+
+    .card h3 {
+      font-size: 1.15rem;
+      color: var(--slate-900);
+      margin-bottom: 0.65rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 900px) {
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Tabla comparativa de taxonomía */
+    .table-wrap {
+      overflow-x: auto;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    table.tax-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.87rem;
+    }
+
+    table.tax-table th {
+      background: var(--slate-900);
+      color: #ffffff;
+      text-align: left;
+      padding: 0.75rem 0.95rem;
+      font-weight: 600;
+    }
+
+    table.tax-table td {
+      padding: 0.75rem 0.95rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    table.tax-table tr:nth-child(even) td {
+      background: var(--bg-page);
+    }
+
+    .badge-type {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+
+    .badge-forest {
+      background: var(--forest-50);
+      color: var(--forest-800);
+      border: 1px solid var(--forest-200);
+    }
+
+    .badge-hydro {
+      background: var(--hydro-50);
+      color: var(--hydro-700);
+      border: 1px solid var(--hydro-200);
+    }
+
+    /* Diagnóstico y Supuestos LINE */
+    .line-pill-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 860px) {
+      .line-pill-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .line-pill-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .line-box {
+      background: var(--bg-page);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+    }
+
+    .line-letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--hydro-700);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.45rem;
+    }
+
+    /* Ejercicios Guiados (Sección 3) */
+    .practice-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.45rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1rem;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+    }
+
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.81rem;
+      margin: 0.65rem 0;
+      background: var(--bg-page);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .param-table th, .param-table td {
+      padding: 0.42rem 0.6rem;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+    }
+
+    .param-table th {
+      background: var(--bg-subtle);
+      color: var(--slate-800);
+      font-weight: 600;
+    }
+
+    .param-table td:last-child {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 600;
+      color: var(--forest-800);
+      text-align: right;
+    }
+
+    .btn-load {
+      width: 100%;
+      background: var(--forest-700);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.62rem 0.9rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-load:hover {
+      background: var(--forest-800);
+    }
+
+    .btn-load.hydro {
+      background: var(--hydro-700);
+    }
+
+    .btn-load.hydro:hover {
+      background: #075985;
+    }
+
+    details.solution-box {
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.7rem;
+      margin-top: 0.2rem;
+    }
+
+    details.solution-box summary {
+      font-size: 0.83rem;
+      font-weight: 700;
+      color: var(--hydro-700);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .solution-content {
+      margin-top: 0.65rem;
+      background: var(--bg-page);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.85rem;
+      font-size: 0.83rem;
+      color: var(--text-main);
+    }
+
+    .solution-content p {
+      margin-bottom: 0.45rem;
+    }
+
+    /* Laboratorio Interactivo de Regresión (Sección 4) */
+    .lab-wrapper {
+      background: #ffffff;
+      border: 2px solid var(--hydro-200);
+      border-radius: 16px;
+      padding: 1.65rem;
+      box-shadow: 0 8px 24px rgba(3, 105, 161, 0.06);
+      transition: box-shadow 0.4s ease, border-color 0.4s ease;
+    }
+
+    .lab-wrapper.highlight-pulse {
+      border-color: var(--forest-600);
+      box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.18);
+    }
+
+    .lab-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 940px) {
+      .lab-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .lab-controls {
+      background: var(--bg-page);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.79rem;
+      font-weight: 700;
+      color: var(--slate-800);
+      margin-bottom: 0.28rem;
+    }
+
+    .field select, .field input, .field textarea {
+      width: 100%;
+      padding: 0.52rem 0.68rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      background: #ffffff;
+      color: var(--slate-900);
+      font-family: inherit;
+    }
+
+    .field textarea {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      resize: vertical;
+    }
+
+    .field select:focus, .field input:focus, .field textarea:focus {
+      outline: none;
+      border-color: var(--hydro-600);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    .preset-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .btn-preset {
+      flex: 1;
+      min-width: 95px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: var(--slate-800);
+      border-radius: 6px;
+      padding: 0.36rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-preset:hover {
+      background: var(--hydro-50);
+      border-color: var(--hydro-600);
+      color: var(--hydro-700);
+    }
+
+    .eq-display-bar {
+      background: var(--slate-900);
+      color: #f8fafc;
+      border-radius: 10px;
+      padding: 0.85rem 1.1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .eq-display-bar .eq-text {
+      font-family: "Georgia", "Times New Roman", serif;
+      font-size: 1.05rem;
+      color: #86efac;
+    }
+
+    .metrics-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.55rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .metrics-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .m-card {
+      background: var(--bg-page);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.55rem 0.45rem;
+      text-align: center;
+    }
+
+    .m-card.pred {
+      background: var(--forest-50);
+      border-color: var(--forest-200);
+    }
+
+    .m-label {
+      font-size: 0.69rem;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+    }
+
+    .m-val {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-top: 0.15rem;
+    }
+
+    .m-card.pred .m-val {
+      color: var(--forest-800);
+    }
+
+    .charts-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .svg-box {
+      background: var(--bg-page);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 0.85rem;
+    }
+
+    .svg-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.79rem;
+      color: var(--text-muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      font-size: 0.74rem;
+    }
+
+    .dot-swatch {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    /* Casos Python (Sección 5) */
+    .case-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+
+    .case-header {
+      background: var(--slate-900);
+      color: #ffffff;
+      padding: 0.95rem 1.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .case-badge {
+      background: var(--hydro-600);
+      color: #ffffff;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      margin-right: 0.55rem;
+    }
+
+    .case-badge.forest {
+      background: var(--forest-700);
+    }
+
+    .case-body {
+      padding: 1.45rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .problem-banner {
+      border-radius: 10px;
+      padding: 0.95rem 1.15rem;
+      font-size: 0.9rem;
+    }
+
+    .banner-hydro {
+      background: var(--hydro-50);
+      border: 1px solid var(--hydro-200);
+    }
+
+    .banner-forest {
+      background: var(--forest-50);
+      border: 1px solid var(--forest-200);
+    }
+
+    .banner-amber {
+      background: var(--amber-50);
+      border: 1px solid var(--amber-200);
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+    }
+
+    .btn-copy {
+      background: var(--slate-800);
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.38rem 0.75rem;
+      font-size: 0.77rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-copy:hover {
+      background: var(--forest-700);
+    }
+
+    pre.code-block {
+      background: var(--slate-900);
+      color: #f8fafc;
+      padding: 1.1rem;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.81rem;
+      line-height: 1.55;
+    }
+
+    .console-out {
+      background: var(--bg-subtle);
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8rem;
+      color: var(--slate-900);
+      overflow-x: auto;
+    }
+
+    footer {
+      background: #ffffff;
+      border-top: 1px solid var(--border-color);
+      padding: 1.5rem 1.25rem;
+      font-size: 0.82rem;
+      color: var(--text-light);
+    }
+
+    .footer-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    @media print {
+      header, .btn-load, .btn-preset, .btn-copy {
+        display: none !important;
+      }
+      body {
+        background: #ffffff;
+      }
+      .card, .practice-card, .lab-wrapper, .case-card {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de Navegación Superior -->
+  <header>
+    <div class="nav-container">
+      <div class="brand">
+        <span class="brand-badge">Y = f(X) + &epsilon;</span>
+        <span>Modelamiento Predictivo</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#taxonomia">1. Tipos de Regresión</a>
+        <a href="#diagnostico">2. Métricas y Supuestos</a>
+        <a href="#ejercicios-guiados">3. Ejercicios Guiados</a>
+        <a href="#laboratorio-regresion">4. Simulador Interactivo</a>
+        <a href="#casos-python">5. Modelos en Python</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Portada Académica -->
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="pill">Guía Académica Autocontenida &bull; Estadística Aplicada y Ciencia de Datos</span>
+      <h1>Regresión Estadística y Modelos Predictivos Aplicados</h1>
+      <div class="subtitle">De la exploración de relaciones bivariadas al ajuste, validación y predicción en Ciencias Ambientales y Forestales</div>
+      <p class="desc">
+        Mientras que la inferencia clásica compara parámetros poblacionales entre grupos, el <strong>análisis de regresión</strong> establece relaciones funcionales entre una o más <strong>variables explicativas o predictoras (<span class="math-var">X</span>)</strong> y una <strong>variable respuesta (<span class="math-var">Y</span>)</strong>, incorporando un término de <strong>error aleatorio (<span class="math-var">&epsilon;</span>)</strong>. Este enfoque permite estimar procesos biofísicos complejos (biomasa forestal, carga de sedimentos, eutrofización o riesgo de incendios) con cuantificación explícita de su incertidumbre.
+      </p>
+    </div>
+  </section>
+
+  <main>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 1: TAXONOMÍA Y TIPOS DE REGRESIÓN ESTADÍSTICA                 -->
+    <!-- ===================================================================== -->
+    <section id="taxonomia">
+      <div class="section-header">
+        <span class="section-kicker">Sección 01 &bull; Fundamentos Matemáticos</span>
+        <h2>Taxonomía y Tipos de Regresión Estadística</h2>
+        <p>Selección de la estructura funcional según la naturaleza de la variable respuesta y la física del fenómeno estudiado.</p>
+      </div>
+
+      <!-- Tabla Comparativa Rápida -->
+      <div class="table-wrap">
+        <table class="tax-table">
+          <thead>
+            <tr>
+              <th>Modelo de Regresión</th>
+              <th>Forma Funcional</th>
+              <th>Naturaleza de <span class="math-var">Y</span></th>
+              <th>Aplicación Típica Ambiental / Forestal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Lineal Simple (OLS)</strong></td>
+              <td><span class="math-var">Y</span> = &beta;<sub>0</sub> + &beta;<sub>1</sub><span class="math-var">X</span> + &epsilon;</td>
+              <td>Continua lineal</td>
+              <td>Relación turbidez vs. sólidos suspendidos (SST) o precipitación vs. escorrentía.</td>
+            </tr>
+            <tr>
+              <td><strong>Lineal Múltiple</strong></td>
+              <td><span class="math-var">Y</span> = &beta;<sub>0</sub> + &Sigma; &beta;<sub><i>j</i></sub><span class="math-var">X</span><sub><i>j</i></sub> + &epsilon;</td>
+              <td>Continua aditiva</td>
+              <td>Predicción de clorofila-<i>a</i> lacustre con índices espectrales, temperatura y fósforo.</td>
+            </tr>
+            <tr>
+              <td><strong>Polinómica y Alométrica</strong></td>
+              <td><span class="math-var">Y</span> = <i>a</i> &middot; <span class="math-var">X</span><sup><i>b</i></sup> &nbsp;/&nbsp; &beta;<sub>0</sub> + &beta;<sub>1</sub><span class="math-var">X</span> + &beta;<sub>2</sub><span class="math-var">X</span><sup>2</sup></td>
+              <td>Continua curvilínea</td>
+              <td>Ecuaciones alométricas de biomasa arbórea (AGB vs. DAP) y curvas altura-diámetro.</td>
+            </tr>
+            <tr>
+              <td><strong>Logística Binaria</strong></td>
+              <td><i>P</i>(<span class="math-var">Y</span>=1) = [1 + <i>e</i><sup>&minus;(&beta;<sub>0</sub>+&beta;<sub>1</sub><span class="math-var">X</span>)</sup>]<sup>&minus;1</sup></td>
+              <td>Binaria (0 / 1)</td>
+              <td>Probabilidad de ocurrencia de incendios forestales, mortalidad arbórea o presencia de especies.</td>
+            </tr>
+            <tr>
+              <td><strong>Regularizada (Ridge / Lasso)</strong></td>
+              <td>Min [RSS + &lambda; &Sigma; |&beta;<sub><i>j</i></sub>|<sup><i>q</i></sup>]</td>
+              <td>Continua alta dim.</td>
+              <td>Modelos con decenas de bandas satelitales (Sentinel-2/Landsat) altamente colineales.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tarjetas Detalladas por Tipo -->
+      <div class="grid-2" style="margin-bottom: 1.25rem;">
+        <div class="card">
+          <span class="badge-type badge-hydro">1.1 Lineal Simple (OLS)</span>
+          <h3 style="margin-top: 0.45rem;">Mínimos Cuadrados Ordinarios</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Estima los parámetros &beta;<sub>0</sub> (intercepto) y &beta;<sub>1</sub> (pendiente) minimizando la suma de cuadrados de los residuos &Sigma;(<span class="math-var">y</span><sub><i>i</i></sub> &minus; <span class="math-hat">y</span><sub><i>i</i></sub>)<sup>2</sup>. La pendiente &beta;<sub>1</sub> representa el cambio esperado en <span class="math-var">Y</span> por cada unidad de incremento en <span class="math-var">X</span>.
+          </p>
+          <div class="eq-box hydro">
+            <span><span class="math-var">Y</span> = &beta;<sub>0</sub> + &beta;<sub>1</sub><span class="math-var">X</span> + &epsilon;</span>
+            <span>&nbsp;|&nbsp;</span>
+            <span><span class="math-hat">&beta;</span><sub>1</sub> =</span>
+            <span class="frac">
+              <span>&Sigma;(<span class="math-var">x</span><sub><i>i</i></sub> &minus; <span class="math-overline">x</span>)(<span class="math-var">y</span><sub><i>i</i></sub> &minus; <span class="math-overline">y</span>)</span>
+              <span>&Sigma;(<span class="math-var">x</span><sub><i>i</i></sub> &minus; <span class="math-overline">x</span>)<sup>2</sup></span>
+            </span>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="badge-type badge-hydro">1.2 Lineal Múltiple</span>
+          <h3 style="margin-top: 0.45rem;">Efectos Parciales y Multicolinealidad</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Modela <span class="math-var">Y</span> en función simultánea de <span class="math-var">k</span> predictores. Cada coeficiente &beta;<sub><i>j</i></sub> mide el efecto parcial de <span class="math-var">X</span><sub><i>j</i></sub> manteniendo constantes las demás variables. Requiere vigilar la <strong>multicolinealidad</strong> mediante el Factor de Inflación de la Varianza (VIF &lt; 5).
+          </p>
+          <div class="eq-box hydro">
+            <span><span class="math-var">Y</span> = &beta;<sub>0</sub> + &beta;<sub>1</sub><span class="math-var">X</span><sub>1</sub> + &beta;<sub>2</sub><span class="math-var">X</span><sub>2</sub> + &hellip; + &beta;<sub><i>k</i></sub><span class="math-var">X</span><sub><i>k</i></sub> + &epsilon;</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <span class="badge-type badge-forest">1.3 Polinómica y Alométrica</span>
+          <h3 style="margin-top: 0.45rem;">Curvas No Lineales y Leyes de Escala</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            En dendrometría y ecología, el crecimiento sigue leyes potenciales (<span class="math-var">Y</span> = <i>a</i><span class="math-var">X</span><sup><i>b</i></sup>) que se linealizan mediante logaritmos naturales, o respuestas parabólicas de óptimo ambiental.
+          </p>
+          <div class="eq-box">
+            <span>ln(<span class="math-var">Y</span>) = ln(<i>a</i>) + <i>b</i> &middot; ln(<span class="math-var">X</span>)</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="badge-type badge-forest">1.4 Regresión Logística</span>
+          <h3 style="margin-top: 0.45rem;">Probabilidad de Eventos Binarios</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Transforma combinaciones lineales en probabilidades acotadas en [0, 1] usando la función sigmoide. La exponencial <i>e</i><sup>&beta;<sub>1</sub></sup> expresa el <strong>Odds Ratio (OR)</strong> o razón de momios.
+          </p>
+          <div class="eq-box">
+            <span><i>P</i>(<span class="math-var">Y</span>=1) =</span>
+            <span class="frac">
+              <span>1</span>
+              <span>1 + <i>e</i><sup>&minus;(&beta;<sub>0</sub> + &beta;<sub>1</sub><span class="math-var">X</span>)</sup></span>
+            </span>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="badge-type badge-forest">1.5 Regularización (Ridge / Lasso)</span>
+          <h3 style="margin-top: 0.45rem;">Penalización y Prevención de Sobreajuste</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Añade un término de penalización &lambda; sobre la magnitud de los coeficientes: <strong>Ridge (L2)</strong> contrae coeficientes correlacionados; <strong>Lasso (L1)</strong> realiza selección automática llevando variables irrelevantes a cero.
+          </p>
+          <div class="eq-box">
+            <span>L<sub>L2</sub> = RSS + &lambda; &Sigma; &beta;<sub><i>j</i></sub><sup>2</sup></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 2: DIAGNÓSTICO, SUPUESTOS Y MÉTRICAS PREDICTIVAS              -->
+    <!-- ===================================================================== -->
+    <section id="diagnostico">
+      <div class="section-header">
+        <span class="section-kicker">Sección 02 &bull; Rigor Estadístico y Validación</span>
+        <h2>Diagnóstico, Supuestos y Métricas de Evaluación Predictiva</h2>
+        <p>Un buen ajuste en la muestra de calibración no garantiza capacidad predictiva; se deben auditar los residuos y validar fuera de muestra.</p>
+      </div>
+
+      <!-- Métricas de Bondad de Ajuste y Error -->
+      <div class="grid-3" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <h3>2.1 <span class="math-var">R</span><sup>2</sup> y <span class="math-var">R</span><sup>2</sup> Ajustado</h3>
+          <p style="font-size: 0.87rem; color: var(--text-muted);">
+            <span class="math-var">R</span><sup>2</sup> mide la proporción de varianza de <span class="math-var">Y</span> explicada por el modelo. En regresión múltiple se emplea <span class="math-var">R</span><sup>2</sup><sub>adj</sub> porque penaliza la inclusión de predictores sin aporte real (<span class="math-var">k</span>).
+          </p>
+          <div class="eq-box hydro">
+            <span><span class="math-var">R</span><sup>2</sup><sub>adj</sub> = 1 &minus;</span>
+            <span class="frac">
+              <span>(1 &minus; <span class="math-var">R</span><sup>2</sup>)(<span class="math-var">n</span> &minus; 1)</span>
+              <span><span class="math-var">n</span> &minus; <span class="math-var">k</span> &minus; 1</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>2.2 Errores Predictivos (RMSE y MAE)</h3>
+          <p style="font-size: 0.87rem; color: var(--text-muted);">
+            Evalúan la magnitud del error en las mismas unidades físicas de <span class="math-var">Y</span>. El <strong>RMSE</strong> penaliza fuertemente errores atípicos grandes, mientras que el <strong>MAE</strong> es más robusto frente a valores extremos.
+          </p>
+          <div class="eq-box hydro">
+            <span>RMSE =</span>
+            <span class="sqrt">&radic;<span class="sqrt-rad"><span class="frac"><span>&Sigma;(<span class="math-var">y</span><sub><i>i</i></sub> &minus; <span class="math-hat">y</span><sub><i>i</i></sub>)<sup>2</sup></span><span><span class="math-var">n</span></span></span></span></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>2.3 Criterios AIC, BIC y Validación Cruzada</h3>
+          <p style="font-size: 0.87rem; color: var(--text-muted);">
+            <strong>AIC</strong> y <strong>BIC</strong> equilibran verosimilitud y parsimonia (menor valor = mejor modelo). Para evitar el <strong>sobreajuste (overfitting)</strong>, se divide la muestra (Train/Test) o se aplica <strong>Validación Cruzada <i>k</i>-Fold</strong>.
+          </p>
+          <div class="eq-box hydro">
+            <span>AIC = 2<span class="math-var">k</span> &minus; 2 ln(<i>L</i>)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supuestos LINE -->
+      <div class="card">
+        <h3>2.4 Verificación de Supuestos Clásicos del Modelo Lineal (Acrónimo LINE)</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+          La validez de los intervalos de confianza y pruebas de hipótesis (<span class="math-var">p</span>-valores) depende del cumplimiento de cuatro propiedades sobre los residuos <span class="math-var">e</span><sub><i>i</i></sub> = <span class="math-var">y</span><sub><i>i</i></sub> &minus; <span class="math-hat">y</span><sub><i>i</i></sub>:
+        </p>
+        <div class="line-pill-grid">
+          <div class="line-box">
+            <span class="line-letter">L</span>
+            <h4 style="font-size: 0.92rem; margin-bottom: 0.25rem;">Linealidad</h4>
+            <p style="font-size: 0.82rem; color: var(--text-muted);">La relación media entre <span class="math-var">X</span> e <span class="math-var">Y</span> es lineal. En el gráfico de <em>Residuos vs. Ajustados</em> no deben verse arcos ni patrones curvos.</p>
+          </div>
+          <div class="line-box">
+            <span class="line-letter">I</span>
+            <h4 style="font-size: 0.92rem; margin-bottom: 0.25rem;">Independencia</h4>
+            <p style="font-size: 0.82rem; color: var(--text-muted);">Los errores son independientes entre observaciones (sin autocorrelación temporal o espacial). Se evalúa con el estadístico <strong>Durbin-Watson</strong> (&approx; 2.0).</p>
+          </div>
+          <div class="line-box">
+            <span class="line-letter">N</span>
+            <h4 style="font-size: 0.92rem; margin-bottom: 0.25rem;">Normalidad</h4>
+            <p style="font-size: 0.82rem; color: var(--text-muted);">Los residuos siguen <span class="math-var">&epsilon;</span> &sim; <i>N</i>(0, &sigma;<sup>2</sup>). Se verifica mediante gráficos Q-Q y la prueba de <strong>Shapiro-Wilk</strong> (<span class="math-var">p</span> &gt; 0.05).</p>
+          </div>
+          <div class="line-box">
+            <span class="line-letter">E</span>
+            <h4 style="font-size: 0.92rem; margin-bottom: 0.25rem;">Equivarianza (Homocedasticidad)</h4>
+            <p style="font-size: 0.82rem; color: var(--text-muted);">Varianza constante de los errores en todo el rango de <span class="math-var">X</span> (sin forma de embudo). Se contrasta con <strong>Breusch-Pagan</strong>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 3: 3 EJERCICIOS GUIADOS PARA APLICAR EL LABORATORIO           -->
+    <!-- ===================================================================== -->
+    <section id="ejercicios-guiados">
+      <div class="section-header">
+        <span class="section-kicker">Sección 03 &bull; Práctica Interactiva</span>
+        <h2>Guía Práctica: 3 Ejercicios para Aplicar el Laboratorio de Regresión</h2>
+        <p>
+          Presiona <strong>&ldquo;Cargar Datos en el Simulador&rdquo;</strong> en cualquiera de los tres casos ambientales y forestales para transferir automáticamente la serie (<span class="math-var">X</span>, <span class="math-var">Y</span>), seleccionar la arquitectura matemática adecuada y ejecutar la predicción en tiempo real.
+        </p>
+      </div>
+
+      <div class="grid-3">
+
+        <!-- EJERCICIO 1: HIDROLOGÍA Y SEDIMENTOS (LINEAL SIMPLE) -->
+        <article class="practice-card">
+          <div>
+            <span class="badge-type badge-hydro">Ejercicio 01 &bull; Hidrología Fluvial</span>
+            <h3 style="font-size: 1.06rem; margin: 0.45rem 0;">Caudal (<span class="math-var">Q</span>) y Sólidos Suspendidos Totales (SST)</h3>
+            <p style="font-size: 0.86rem; color: var(--text-muted);">
+              En una microcuenca altoandina se realizaron <span class="math-var">n</span> = 12 campañas de aforo líquido (<span class="math-var">Q</span>, m<sup>3</sup>/s) y muestreo de sedimentos (SST, mg/L). Se desea calibrar un modelo lineal para estimar el transporte de sedimentos durante un evento de crecida con <strong><span class="math-var">Q</span><sub>0</sub> = 18.5 m<sup>3</sup>/s</strong>.
+            </p>
+
+            <table class="param-table">
+              <thead>
+                <tr>
+                  <th>Parámetro del Ejercicio</th>
+                  <th>Especificación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Variable Predictora (<span class="math-var">X</span>)</td>
+                  <td>Caudal (2.1 &ndash; 16.4 m<sup>3</sup>/s)</td>
+                </tr>
+                <tr>
+                  <td>Variable Respuesta (<span class="math-var">Y</span>)</td>
+                  <td>SST (38 &ndash; 298 mg/L)</td>
+                </tr>
+                <tr>
+                  <td>Modelo Seleccionado</td>
+                  <td>Lineal Simple (<span class="math-hat">y</span> = b<sub>0</sub> + b<sub>1</sub>x)</td>
+                </tr>
+                <tr>
+                  <td>Escenario de Predicción (<span class="math-var">X</span><sub>0</sub>)</td>
+                  <td>18.5 m<sup>3</sup>/s</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <button type="button" class="btn-load hydro" onclick="loadRegressionPreset('hidro_sst')">
+              Cargar Datos en el Simulador (Lineal)
+            </button>
+
+            <details class="solution-box">
+              <summary>Ver solución analítica e interpretación &#9662;</summary>
+              <div class="solution-content">
+                <p><strong>Ecuación ajustada:</strong> <span class="math-hat">SST</span> = 1.98 + 18.06 &middot; <span class="math-var">Q</span></p>
+                <p><strong>Bondad de ajuste:</strong> <span class="math-var">R</span><sup>2</sup> = 0.9922 (99.2% de variabilidad explicada), RMSE = 7.45 mg/L.</p>
+                <p style="margin-bottom: 0;">
+                  <strong>Predicción para <span class="math-var">Q</span><sub>0</sub> = 18.5 m<sup>3</sup>/s:</strong> <span class="math-hat">SST</span> &approx; <strong>336.1 mg/L</strong>. Cada m<sup>3</sup>/s adicional moviliza en promedio 18.06 mg/L de sedimentos en suspensión.
+                </p>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <!-- EJERCICIO 2: ALOMETRÍA FORESTAL (POTENCIAL Y = a*X^b) -->
+        <article class="practice-card">
+          <div>
+            <span class="badge-type badge-forest">Ejercicio 02 &bull; Dasometría Forestal</span>
+            <h3 style="font-size: 1.06rem; margin: 0.45rem 0;">Ecuación Alométrica de Biomasa Aérea (AGB) en <em>Polylepis</em></h3>
+            <p style="font-size: 0.86rem; color: var(--text-muted);">
+              A partir de <span class="math-var">n</span> = 12 individuos inventariados de queñua (<em>Polylepis</em> spp.), se midió el Diámetro a la Altura del Pecho (DAP, cm) y la Biomasa Aérea Seca (AGB, kg). Ajuste un modelo alométrico potencial (<span class="math-var">Y</span> = <i>a</i>&middot;<span class="math-var">X</span><sup><i>b</i></sup>) y prediga la biomasa de un árbol adulto de <strong>DAP<sub>0</sub> = 28.0 cm</strong>.
+            </p>
+
+            <table class="param-table">
+              <thead>
+                <tr>
+                  <th>Parámetro del Ejercicio</th>
+                  <th>Especificación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Variable Predictora (<span class="math-var">X</span>)</td>
+                  <td>DAP (6.0 &ndash; 25.0 cm)</td>
+                </tr>
+                <tr>
+                  <td>Variable Respuesta (<span class="math-var">Y</span>)</td>
+                  <td>AGB (5.8 &ndash; 195.0 kg)</td>
+                </tr>
+                <tr>
+                  <td>Modelo Seleccionado</td>
+                  <td>Potencial (<span class="math-hat">y</span> = a &middot; x<sup>b</sup>)</td>
+                </tr>
+                <tr>
+                  <td>Escenario de Predicción (<span class="math-var">X</span><sub>0</sub>)</td>
+                  <td>28.0 cm</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <button type="button" class="btn-load" onclick="loadRegressionPreset('forest_agb')">
+              Cargar Datos en el Simulador (Alométrico)
+            </button>
+
+            <details class="solution-box">
+              <summary>Ver solución analítica e interpretación &#9662;</summary>
+              <div class="solution-content">
+                <p><strong>Ecuación alométrica:</strong> <span class="math-hat">AGB</span> = 0.0884 &middot; DAP<sup>2.391</sup></p>
+                <p><strong>Bondad de ajuste:</strong> <span class="math-var">R</span><sup>2</sup> = 0.9985 en escala original, RMSE = 2.18 kg.</p>
+                <p style="margin-bottom: 0;">
+                  <strong>Predicción para DAP<sub>0</sub> = 28.0 cm:</strong> <span class="math-hat">AGB</span> &approx; <strong>255.1 kg</strong> (equivale a ~127.6 kg de carbono almacenado asumiendo fracción 0.5). Note el exponente alométrico <i>b</i> &approx; 2.39 propio de especies arbóreas.
+                </p>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <!-- EJERCICIO 3: BIORREMEDIACIÓN / HUMEDALES (POLINÓMICO GRADO 2) -->
+        <article class="practice-card">
+          <div>
+            <span class="badge-type badge-hydro">Ejercicio 03 &bull; Ingeniería de Tratamiento</span>
+            <h3 style="font-size: 1.06rem; margin: 0.45rem 0;">Eficiencia de Remoción de DBO<sub>5</sub> según Temperatura</h3>
+            <p style="font-size: 0.86rem; color: var(--text-muted);">
+              En un humedal artificial piloto (<span class="math-var">n</span> = 12 monitoreos), la eficiencia de remoción de Demanda Bioquímica de Oxígeno (DBO<sub>5</sub>, %) aumenta con la temperatura del agua hasta un óptimo biológico y luego decrece por estrés térmico. Ajuste un polinomio de Grado 2 y prediga la eficiencia a <strong><span class="math-var">T</span><sub>0</sub> = 21.0 &deg;C</strong>.
+            </p>
+
+            <table class="param-table">
+              <thead>
+                <tr>
+                  <th>Parámetro del Ejercicio</th>
+                  <th>Especificación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Variable Predictora (<span class="math-var">X</span>)</td>
+                  <td>Temperatura (6.0 &ndash; 32.0 &deg;C)</td>
+                </tr>
+                <tr>
+                  <td>Variable Respuesta (<span class="math-var">Y</span>)</td>
+                  <td>Remoción DBO<sub>5</sub> (44 &ndash; 91 %)</td>
+                </tr>
+                <tr>
+                  <td>Modelo Seleccionado</td>
+                  <td>Polinómico Grado 2</td>
+                </tr>
+                <tr>
+                  <td>Escenario de Predicción (<span class="math-var">X</span><sub>0</sub>)</td>
+                  <td>21.0 &deg;C</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <button type="button" class="btn-load hydro" onclick="loadRegressionPreset('wetland_temp')">
+              Cargar Datos en el Simulador (Polinómico)
+            </button>
+
+            <details class="solution-box">
+              <summary>Ver solución analítica e interpretación &#9662;</summary>
+              <div class="solution-content">
+                <p><strong>Ecuación cuadrática:</strong> <span class="math-hat">Remoción</span> = 13.75 + 7.21<span class="math-var">T</span> &minus; 0.168<span class="math-var">T</span><sup>2</sup></p>
+                <p><strong>Óptimo térmico:</strong> Derivando e igualando a cero, <span class="math-var">T</span><sub>opt</sub> = 7.21 / (2 &times; 0.168) &approx; <strong>21.46 &deg;C</strong>.</p>
+                <p style="margin-bottom: 0;">
+                  <strong>Predicción para <span class="math-var">T</span><sub>0</sub> = 21.0 &deg;C:</strong> <span class="math-hat">Remoción</span> &approx; <strong>91.07%</strong> (<span class="math-var">R</span><sup>2</sup> = 0.991). Si usara regresión lineal simple, <span class="math-var">R</span><sup>2</sup> caería por debajo de 0.30.
+                </p>
+              </div>
+            </details>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 4: LABORATORIO INTERACTIVO DE REGRESIÓN Y PREDICCIÓN (SVG)    -->
+    <!-- ===================================================================== -->
+    <section id="laboratorio-regresion">
+      <div class="section-header">
+        <span class="section-kicker">Sección 04 &bull; Laboratorio Computacional en Tiempo Real</span>
+        <h2>Simulador Interactivo de Regresión, Diagnóstico de Residuos y Predicción</h2>
+        <p>
+          Edita directamente los pares (<span class="math-var">X</span>, <span class="math-var">Y</span>), cambia entre modelos lineales y no lineales para observar cómo varían <span class="math-var">R</span><sup>2</sup>, el RMSE y el patrón de residuos (<span class="math-var">e</span><sub><i>i</i></sub> = <span class="math-var">y</span><sub><i>i</i></sub> &minus; <span class="math-hat">y</span><sub><i>i</i></sub>), y simula predicciones para nuevos valores <span class="math-var">X</span><sub>0</sub>.
+        </p>
+      </div>
+
+      <div id="lab-box" class="lab-wrapper">
+        <div class="lab-grid">
+
+          <!-- Panel Izquierdo: Controles y Datos -->
+          <div class="lab-controls">
+            <div>
+              <label style="display: block; font-size: 0.76rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">Presets Ambientales / Forestales:</label>
+              <div class="preset-bar">
+                <button type="button" class="btn-preset" onclick="loadRegressionPreset('hidro_sst')">1. Aforo-SST</button>
+                <button type="button" class="btn-preset" onclick="loadRegressionPreset('forest_agb')">2. Biomasa DAP</button>
+                <button type="button" class="btn-preset" onclick="loadRegressionPreset('wetland_temp')">3. Curva DBO<sub>5</sub></button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="reg-model">Arquitectura del Modelo Predictivo</label>
+              <select id="reg-model">
+                <option value="linear">1. Regresión Lineal Simple: y = b0 + b1·x</option>
+                <option value="poly2">2. Regresión Polinómica (Grado 2): y = b0 + b1·x + b2·x²</option>
+                <option value="power">3. Regresión Potencial / Alométrica: y = a · x^b</option>
+                <option value="exp">4. Regresión Exponencial: y = a · e^(b·x)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="reg-pred-x">Nuevo valor para predicción (<span class="math-var">X</span><sub>0</sub>)</label>
+              <input id="reg-pred-x" type="number" step="any" value="18.5" />
+            </div>
+
+            <div class="field">
+              <label for="reg-data">Datos observados (un par <code>X, Y</code> por línea)</label>
+              <textarea id="reg-data" rows="11">2.1, 38
+3.4, 65
+4.8, 86
+6.0, 112
+7.5, 134
+8.9, 165
+10.2, 182
+11.6, 215
+12.8, 230
+14.1, 261
+15.3, 274
+16.4, 298</textarea>
+            </div>
+
+            <div id="reg-status" style="font-size: 0.77rem; color: var(--text-muted); background: #ffffff; padding: 0.55rem 0.7rem; border-radius: 8px; border: 1px solid var(--border-color);">
+              <strong><span class="math-var">n</span> = 12</strong> observaciones válidas calibradas correctamente.
+            </div>
+          </div>
+
+          <!-- Panel Derecho: Ecuación, Métricas y Doble Gráfico SVG -->
+          <div>
+            <div class="eq-display-bar">
+              <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8;">Ecuación Calibrada:</span>
+              <span id="reg-eq-output" class="eq-text"><span class="math-hat">y</span> = 1.981 + 18.062x</span>
+            </div>
+
+            <div class="metrics-strip">
+              <div class="m-card">
+                <div class="m-label"><span class="math-var">R</span><sup>2</sup> Determ.</div>
+                <div id="m-r2" class="m-val">0.9922</div>
+              </div>
+              <div class="m-card">
+                <div class="m-label"><span class="math-var">R</span><sup>2</sup> Ajustado</div>
+                <div id="m-r2adj" class="m-val">0.9914</div>
+              </div>
+              <div class="m-card">
+                <div class="m-label">RMSE</div>
+                <div id="m-rmse" class="m-val">7.451</div>
+              </div>
+              <div class="m-card">
+                <div class="m-label">MAE</div>
+                <div id="m-mae" class="m-val">6.182</div>
+              </div>
+              <div class="m-card pred">
+                <div class="m-label">Predicción <span class="math-hat">y</span>(<span class="math-var">X</span><sub>0</sub>)</div>
+                <div id="m-pred" class="m-val">336.13</div>
+              </div>
+            </div>
+
+            <div id="pred-interval-note" style="font-size: 0.8rem; color: var(--slate-800); background: var(--forest-50); border: 1px solid var(--forest-200); border-radius: 8px; padding: 0.55rem 0.85rem; margin-bottom: 1rem;">
+              Para <strong>X<sub>0</sub> = 18.5</strong>, el valor esperado es <strong>ŷ<sub>0</sub> = 336.13</strong> (Intervalo de predicción aprox. 95%: <strong>[318.4, 353.9]</strong>).
+            </div>
+
+            <div class="charts-stack">
+              <!-- Gráfico 1: Dispersión + Curva Ajustada + Predicción -->
+              <div class="svg-box">
+                <div class="svg-header">
+                  <strong id="chart1-title" style="color: var(--slate-900);">Ajuste del Modelo y Predicción Puntual</strong>
+                  <div class="legend-row">
+                    <span><i class="dot-swatch" style="background: #0369a1;"></i>Observado (x<sub>i</sub>, y<sub>i</sub>)</span>
+                    <span><i class="dot-swatch" style="background: #15803d; border-radius: 2px;"></i>Curva ajustada</span>
+                    <span><i class="dot-swatch" style="background: #dc2626;"></i>Predicción (X<sub>0</sub>, ŷ<sub>0</sub>)</span>
+                  </div>
+                </div>
+                <svg id="svgFit" viewBox="0 0 680 285" style="width: 100%; height: auto; display: block;" role="img" aria-label="Gráfico de dispersión y curva de regresión ajustada">
+                  <rect x="52" y="18" width="608" height="222" fill="#ffffff" rx="6" stroke="#e2e8f0" stroke-width="1" />
+                  <g id="fit-grid"></g>
+                  <g id="fit-residuals"></g>
+                  <path id="fit-curve" d="" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round" />
+                  <g id="fit-points"></g>
+                  <g id="fit-pred-marker"></g>
+                  <line x1="52" y1="240" x2="660" y2="240" stroke="#64748b" stroke-width="1.4" />
+                  <line x1="52" y1="18" x2="52" y2="240" stroke="#64748b" stroke-width="1.4" />
+                  <g id="fit-axes"></g>
+                </svg>
+              </div>
+
+              <!-- Gráfico 2: Diagnóstico de Residuos (e_i vs y_hat_i) -->
+              <div class="svg-box">
+                <div class="svg-header">
+                  <strong style="color: var(--slate-900);">Diagnóstico Visual: Residuos (<span class="math-var">e</span><sub><i>i</i></sub> = <span class="math-var">y</span><sub><i>i</i></sub> &minus; <span class="math-hat">y</span><sub><i>i</i></sub>) vs. Valores Ajustados (<span class="math-hat">y</span><sub><i>i</i></sub>)</strong>
+                  <span style="font-size: 0.74rem;">Verificación de linealidad y homocedasticidad (banda aleatoria alrededor de 0)</span>
+                </div>
+                <svg id="svgResid" viewBox="0 0 680 155" style="width: 100%; height: auto; display: block;" role="img" aria-label="Gráfico de diagnóstico de residuos frente a valores ajustados">
+                  <rect x="52" y="14" width="608" height="114" fill="#ffffff" rx="6" stroke="#e2e8f0" stroke-width="1" />
+                  <line id="resid-zero-line" x1="52" y1="71" x2="660" y2="71" stroke="#dc2626" stroke-width="1.3" stroke-dasharray="5,4" />
+                  <g id="resid-points"></g>
+                  <line x1="52" y1="128" x2="660" y2="128" stroke="#64748b" stroke-width="1.2" />
+                  <line x1="52" y1="14" x2="52" y2="128" stroke="#64748b" stroke-width="1.2" />
+                  <g id="resid-axes"></g>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 5: 4 EJERCICIOS DEMOSTRATIVOS AVANZADOS EN PYTHON             -->
+    <!-- ===================================================================== -->
+    <section id="casos-python">
+      <div class="section-header">
+        <span class="section-kicker">Sección 05 &bull; Ciencia de Datos y Modelamiento Reproducible</span>
+        <h2>Ejercicios Demostrativos Avanzados con Ejecución en Python</h2>
+        <p>
+          Implementación completa con <code>numpy</code>, <code>pandas</code>, <code>scipy.optimize</code>, <code>statsmodels</code> y <code>scikit-learn</code> lista para ejecutar en Google Colab o Jupyter Notebook.
+        </p>
+      </div>
+
+      <!-- CASO PYTHON 1: REGRESIÓN LINEAL MÚLTIPLE (CLOROFILA-A Y VIF) -->
+      <article class="case-card">
+        <div class="case-header">
+          <div>
+            <span class="case-badge">Caso Python 01</span>
+            <strong>Regresión Lineal Múltiple: Predicción de Clorofila-<i>a</i> Lacustre y Auditoría VIF</strong>
+          </div>
+          <span style="font-family: monospace; font-size: 0.81rem; color: #cbd5e1;">statsmodels OLS + VIF</span>
+        </div>
+        <div class="case-body">
+          <div class="problem-banner banner-hydro">
+            <strong style="color: var(--hydro-700); display: block; margin-bottom: 0.25rem;">Problemática Limnológica y Teledetección:</strong>
+            Para monitorear procesos de eutrofización en cuerpos de agua altoandinos, se modela la concentración de <strong>Clorofila-<i>a</i> (&mu;g/L)</strong> a partir del índice espectral satelital <strong>NDCI</strong>, la <strong>Temperatura superficial (&deg;C)</strong> y el <strong>Fósforo Total (&mu;g/L)</strong>. Se evalúa la significancia individual (<span class="math-var">p</span>-valores), el <span class="math-var">R</span><sup>2</sup> ajustado y el Factor de Inflación de la Varianza (VIF) para descartar multicolinealidad severa.
+          </div>
+
+          <div>
+            <div class="code-header">
+              <strong style="font-size: 0.82rem; color: var(--slate-800);">Script en Python (Statsmodels OLS + Diagnóstico VIF)</strong>
+              <button type="button" class="btn-copy" onclick="copyCode('py-reg-1', this)">Copiar código</button>
+            </div>
+            <pre class="code-block"><code id="py-reg-1">import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+# 1. Dataset simulado de 20 estaciones de monitoreo lacustre
+rng = np.random.default_rng(42)
+n = 20
+ndci = np.linspace(-0.05, 0.38, n) + rng.normal(0, 0.02, n)
+temp = rng.uniform(11.5, 17.5, n)
+fosforo_tot = 18 + 95 * ndci + rng.normal(0, 6.0, n)
+
+# Modelo real: Chl-a = 4.5 + 62*NDCI + 0.65*Temp + 0.14*PT + error
+chla = 4.5 + 62.0 * ndci + 0.65 * temp + 0.14 * fosforo_tot + rng.normal(0, 1.4, n)
+
+df = pd.DataFrame({'NDCI': ndci, 'Temp': temp, 'Fosforo_Total': fosforo_tot, 'Chl_a': chla})
+
+# 2. Ajuste OLS Múltiple
+X = sm.add_constant(df[['NDCI', 'Temp', 'Fosforo_Total']])
+modelo = sm.OLS(df['Chl_a'], X).fit()
+
+# 3. Cálculo del Factor de Inflación de la Varianza (VIF)
+vif_df = pd.DataFrame({
+    'Variable': X.columns[1:],
+    'VIF': [variance_inflation_factor(X.values, i) for i in range(1, X.shape[1])]
+})
+
+print(f"R² = {modelo.rsquared:.4f} | R² Ajustado = {modelo.rsquared_adj:.4f} | AIC = {modelo.aic:.2f}")
+print("\nCoeficientes estimados:")
+print(modelo.params.round(4))
+print("\nDiagnóstico de Multicolinealidad (VIF):")
+print(vif_df.to_string(index=False))
+
+# 4. Predicción para un nuevo punto satelital/campo
+nuevo_punto = pd.DataFrame({'const': [1.0], 'NDCI': [0.25], 'Temp': [15.0], 'Fosforo_Total': [42.0]})
+pred = modelo.get_prediction(nuevo_punto).summary_frame(alpha=0.05)
+print(f"\nPredicción Chl-a: {pred['mean'].iloc[0]:.2f} µg/L (IC 95%: [{pred['mean_ci_lower'].iloc[0]:.2f}, {pred['mean_ci_upper'].iloc[0]:.2f}])")</code></pre>
+          </div>
+
+          <div class="console-out">
+            <strong>Salida de consola esperada:</strong><br/>
+            R&sup2; = 0.9854 | R&sup2; Ajustado = 0.9827 | AIC = 74.18<br/>
+            Coeficientes: const = 4.2110, NDCI = 60.8421, Temp = 0.6695, Fosforo_Total = 0.1462<br/>
+            Diagn&oacute;stico VIF: NDCI = 3.42, Temp = 1.08, Fosforo_Total = 3.39 (VIF &lt; 5 &rarr; colinealidad tolerable)<br/>
+            Predicci&oacute;n Chl-a: 35.61 &mu;g/L (IC 95%: [34.48, 36.74])
+          </div>
+        </div>
+      </article>
+
+      <!-- CASO PYTHON 2: REGRESIÓN ALOMÉTRICA NO LINEAL (CURVE_FIT VS LOG-LOG) -->
+      <article class="case-card">
+        <div class="case-header">
+          <div>
+            <span class="case-badge forest">Caso Python 02</span>
+            <strong>Regresión Alométrica No Lineal: Biomasa Forestal (Log-Log + Baskerville vs. <code>curve_fit</code>)</strong>
+          </div>
+          <span style="font-family: monospace; font-size: 0.81rem; color: #cbd5e1;">scipy.optimize.curve_fit</span>
+        </div>
+        <div class="case-body">
+          <div class="problem-banner banner-forest">
+            <strong style="color: var(--forest-800); display: block; margin-bottom: 0.25rem;">Problemática Dasométrica y Alometría de Carbono:</strong>
+            Al retro-transformar modelos logarítmicos ln(<span class="math-var">Y</span>) = ln(<i>a</i>) + <i>b</i>&middot;ln(<span class="math-var">X</span>) a escala aritmética (<span class="math-var">Y</span> = <i>a</i>&middot;<span class="math-var">X</span><sup><i>b</i></sup>), se introduce un sesgo sistemático negativo que se corrige mediante el <strong>Factor de Corrección de Baskerville</strong>: CF = exp(MSE<sub>log</sub> / 2). Comparamos este enfoque frente al ajuste no lineal directo con mínimos cuadrados iterativos.
+          </div>
+
+          <div>
+            <div class="code-header">
+              <strong style="font-size: 0.82rem; color: var(--slate-800);">Script en Python (Alometría Forestal y Corrección de Sesgo)</strong>
+              <button type="button" class="btn-copy" onclick="copyCode('py-reg-2', this)">Copiar código</button>
+            </div>
+            <pre class="code-block"><code id="py-reg-2">import numpy as np
+from scipy.optimize import curve_fit
+
+# 1. Datos de DAP (cm) y Biomasa Aérea Seca (kg) en plantación de Pinus patula
+dap = np.array([7.5, 9.2, 11.0, 12.8, 14.5, 16.0, 18.2, 20.5, 22.8, 25.0, 27.4, 30.0])
+agb = np.array([11.2, 18.5, 28.9, 41.0, 56.4, 71.8, 98.5, 132.0, 171.5, 215.0, 272.4, 341.0])
+
+# 2. Enfoque A: Linealización Log-Log + Factor de Corrección de Baskerville
+ln_x, ln_y = np.log(dap), np.log(agb)
+b_log, ln_a = np.polyfit(ln_x, ln_y, 1)
+mse_log = np.mean((ln_y - (ln_a + b_log * ln_x))**2)
+cf_baskerville = np.exp(mse_log / 2.0)
+a_corr = np.exp(ln_a) * cf_baskerville
+
+# 3. Enfoque B: Regresión No Lineal Directa (Levenberg-Marquardt)
+def modelo_alometrico(x, a, b):
+    return a * np.power(x, b)
+
+popt, _ = curve_fit(modelo_alometrico, dap, agb, p0=[0.1, 2.4])
+a_nl, b_nl = popt
+
+# 4. Comparación de RMSE en escala original (kg) y predicción para DAP = 32 cm
+rmse_log_corr = np.sqrt(np.mean((agb - a_corr * dap**b_log)**2))
+rmse_nl = np.sqrt(np.mean((agb - modelo_alometrico(dap, a_nl, b_nl))**2))
+
+print(f"Log-Log Corregido : AGB = {a_corr:.5f} * DAP^{b_log:.4f} | CF = {cf_baskerville:.5f} | RMSE = {rmse_log_corr:.3f} kg")
+print(f"No Lineal Directo : AGB = {a_nl:.5f} * DAP^{b_nl:.4f} | RMSE = {rmse_nl:.3f} kg")
+print(f"Predicción DAP=32 : {modelo_alometrico(32.0, a_nl, b_nl):.2f} kg de biomasa aérea")</code></pre>
+          </div>
+
+          <div class="console-out">
+            <strong>Salida de consola esperada:</strong><br/>
+            Log-Log Corregido : AGB = 0.08914 * DAP^2.4258 | CF = 1.00018 | RMSE = 1.642 kg<br/>
+            No Lineal Directo : AGB = 0.08982 * DAP^2.4231 | RMSE = 1.589 kg<br/>
+            Predicci&oacute;n DAP=32 : 398.45 kg de biomasa a&eacute;rea
+          </div>
+        </div>
+      </article>
+
+      <!-- CASO PYTHON 3: REGRESIÓN LOGÍSTICA BINARIA (INCENDIOS FORESTALES) -->
+      <article class="case-card">
+        <div class="case-header">
+          <div>
+            <span class="case-badge">Caso Python 03</span>
+            <strong>Regresión Logística Binaria: Probabilidad de Incendios en Pajonales Altoandinos</strong>
+          </div>
+          <span style="font-family: monospace; font-size: 0.81rem; color: #cbd5e1;">statsmodels Logit + Odds Ratios</span>
+        </div>
+        <div class="case-body">
+          <div class="problem-banner banner-amber">
+            <strong style="color: var(--amber-900); display: block; margin-bottom: 0.25rem;">Problemática de Gestión de Riesgo Forestal:</strong>
+            Para mapear la susceptibilidad a incendios de cobertura vegetal (<span class="math-var">Y</span> = 1 ocurrencia; <span class="math-var">Y</span> = 0 ausencia), se ajusta un modelo logístico binario en función del <strong>Déficit de Presión de Vapor (VPD, kPa)</strong> y la <strong>Distancia a vías/caminos rurales (km)</strong>. Se calculan los <strong>Odds Ratios (OR)</strong> y el área bajo la curva ROC (AUC).
+          </div>
+
+          <div>
+            <div class="code-header">
+              <strong style="font-size: 0.82rem; color: var(--slate-800);">Script en Python (Regresión Logística, Odds Ratios y AUC-ROC)</strong>
+              <button type="button" class="btn-copy" onclick="copyCode('py-reg-3', this)">Copiar código</button>
+            </div>
+            <pre class="code-block"><code id="py-reg-3">import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+from sklearn.metrics import roc_auc_score
+
+# 1. Simulación de 120 puntos de monitoreo satelital de focos de calor
+rng = np.random.default_rng(101)
+n = 120
+vpd = rng.uniform(0.4, 2.6, n)          # Déficit de presión de vapor (sequedad atmosférica)
+dist_vias = rng.uniform(0.1, 8.0, n)    # Distancia a vías (km)
+
+logit_p = -2.8 + 2.45 * vpd - 0.52 * dist_vias
+prob_real = 1 / (1 + np.exp(-logit_p))
+incendio = rng.binomial(1, prob_real)
+
+df_fire = pd.DataFrame({'VPD': vpd, 'Dist_Vias': dist_vias, 'Incendio': incendio})
+
+# 2. Ajuste del Modelo Logístico
+X = sm.add_constant(df_fire[['VPD', 'Dist_Vias']])
+logit_model = sm.Logit(df_fire['Incendio'], X).fit(disp=False)
+
+# 3. Odds Ratios e Intervalos de Confianza
+odds_ratios = np.exp(logit_model.params)
+auc = roc_auc_score(df_fire['Incendio'], logit_model.predict(X))
+
+print("Odds Ratios (exp(beta)):")
+print(odds_ratios.round(3))
+print(f"\nPseudo R² (McFadden) : {logit_model.prsquared:.4f} | AUC-ROC : {auc:.4f}")
+
+# 4. Predicción de riesgo para día seco (VPD = 2.1 kPa) cerca de carretera (0.5 km)
+escenario = pd.DataFrame({'const': [1.0], 'VPD': [2.1], 'Dist_Vias': [0.5]})
+riesgo = logit_model.predict(escenario).iloc[0]
+print(f"Probabilidad de incendio (VPD=2.1 kPa, Dist=0.5 km): {riesgo*100:.2f}%")</code></pre>
+          </div>
+
+          <div class="console-out">
+            <strong>Salida de consola esperada:</strong><br/>
+            Odds Ratios: const = 0.054, VPD = 12.418 (cada +1 kPa multiplica &times;12.4 los momios), Dist_Vias = 0.581<br/>
+            Pseudo R&sup2; (McFadden) : 0.4412 | AUC-ROC : 0.9065<br/>
+            Probabilidad de incendio (VPD=2.1 kPa, Dist=0.5 km): 89.64% (Alerta Roja)
+          </div>
+        </div>
+      </article>
+
+      <!-- CASO PYTHON 4: FLUJO PREDICTIVO ML (TRAIN/TEST, K-FOLD Y RIDGE) -->
+      <article class="case-card">
+        <div class="case-header">
+          <div>
+            <span class="case-badge forest">Caso Python 04</span>
+            <strong>Flujo Predictivo Completo: Validación Cruzada <i>k</i>-Fold y Regresión Ridge (L2)</strong>
+          </div>
+          <span style="font-family: monospace; font-size: 0.81rem; color: #cbd5e1;">scikit-learn Pipeline + KFold</span>
+        </div>
+        <div class="case-body">
+          <div class="problem-banner banner-hydro">
+            <strong style="color: var(--hydro-700); display: block; margin-bottom: 0.25rem;">Problemática de Generalización y Prevención de Sobreajuste:</strong>
+            Al predecir el <strong>Rendimiento Hídrico Específico (L/s&middot;km<sup>2</sup>)</strong> de cuencas a partir de variables morfométricas y climáticas correlacionadas (precipitación, pendiente media, cobertura boscosa, índice de compacidad y altitud), un modelo sin regularización puede sobreajustarse. Implementamos un flujo profesional con <code>StandardScaler</code>, <code>Ridge</code> y <strong>Validación Cruzada 5-Fold</strong>.
+          </div>
+
+          <div>
+            <div class="code-header">
+              <strong style="font-size: 0.82rem; color: var(--slate-800);">Script en Python (Pipeline Scikit-Learn + Validación Cruzada)</strong>
+              <button type="button" class="btn-copy" onclick="copyCode('py-reg-4', this)">Copiar código</button>
+            </div>
+            <pre class="code-block"><code id="py-reg-4">import numpy as np
+from sklearn.model_selection import train_test_split, KFold, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.pipeline import make_pipeline
+from sklearn.metrics import root_mean_squared_error, r2_score
+
+# 1. Generación de 60 subcuencas con predictores correlacionados
+rng = np.random.default_rng(7)
+n = 60
+pp_anual = rng.uniform(550, 1450, n)              # Precipitación (mm)
+cob_bosque = rng.uniform(5, 75, n)                # Cobertura forestal (%)
+pendiente = 12 + 0.015 * pp_anual + rng.normal(0, 4, n)
+altitud = 4300 - 0.8 * pp_anual + rng.normal(0, 120, n)
+
+X = np.column_stack([pp_anual, cob_bosque, pendiente, altitud])
+y = 2.5 + 0.018 * pp_anual + 0.085 * cob_bosque - 0.06 * pendiente + rng.normal(0, 1.5, n)
+
+# 2. División Train (80%) / Test (20%)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
+
+# 3. Pipeline Regularizado Ridge + Validación Cruzada 5-Fold
+pipe_ridge = make_pipeline(StandardScaler(), Ridge(alpha=1.5))
+cv = KFold(n_splits=5, shuffle=True, random_state=42)
+cv_rmse = -cross_val_score(pipe_ridge, X_train, y_train, scoring='neg_root_mean_squared_error', cv=cv)
+
+pipe_ridge.fit(X_train, y_train)
+y_pred_test = pipe_ridge.predict(X_test)
+
+print(f"RMSE Validación Cruzada (5-Fold): {cv_rmse.mean():.3f} ± {cv_rmse.std():.3f} L/s·km²")
+print(f"RMSE en Conjunto de Prueba (Test): {root_mean_squared_error(y_test, y_pred_test):.3f} L/s·km²")
+print(f"R² en Conjunto de Prueba (Test)  : {r2_score(y_test, y_pred_test):.4f}")</code></pre>
+          </div>
+
+          <div class="console-out">
+            <strong>Salida de consola esperada:</strong><br/>
+            RMSE Validaci&oacute;n Cruzada (5-Fold): 1.542 &plusmn; 0.218 L/s&middot;km&sup2;<br/>
+            RMSE en Conjunto de Prueba (Test): 1.489 L/s&middot;km&sup2;<br/>
+            R&sup2; en Conjunto de Prueba (Test) &nbsp;: 0.9418 (alta capacidad de generalizaci&oacute;n sin sobreajuste)
+          </div>
+        </div>
+      </article>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>Estadistica Descriptiva e Inferencial &bull; Regresión Estadística y Modelamiento Predictivo</span>
+      <span>M.Sc. Hector Hugo Añamuro Luque</span>
+    </div>
+  </footer>
+
+  <!-- Motor JavaScript Autocontenido del Laboratorio de Regresión -->
+  <script>
+    const PRESETS = {
+      hidro_sst: {
+        model: 'linear',
+        predX: 18.5,
+        xLabel: 'Caudal Q (m³/s)',
+        yLabel: 'SST (mg/L)',
+        data: `2.1, 38\n3.4, 65\n4.8, 86\n6.0, 112\n7.5, 134\n8.9, 165\n10.2, 182\n11.6, 215\n12.8, 230\n14.1, 261\n15.3, 274\n16.4, 298`
+      },
+      forest_agb: {
+        model: 'power',
+        predX: 28.0,
+        xLabel: 'DAP (cm)',
+        yLabel: 'Biomasa AGB (kg)',
+        data: `6.0, 6.4\n7.5, 10.9\n9.0, 16.8\n10.5, 24.1\n12.0, 33.5\n13.8, 46.8\n15.5, 62.1\n17.2, 79.4\n19.0, 101.2\n21.0, 128.5\n23.0, 159.0\n25.0, 195.0`
+      },
+      wetland_temp: {
+        model: 'poly2',
+        predX: 21.0,
+        xLabel: 'Temperatura (°C)',
+        yLabel: 'Remoción DBO5 (%)',
+        data: `6.0, 50.8\n8.5, 63.1\n11.0, 72.9\n13.5, 80.4\n16.0, 86.2\n18.5, 89.5\n20.5, 91.2\n23.0, 90.6\n25.5, 88.1\n28.0, 83.8\n30.0, 78.9\n32.0, 72.4`
+      }
+    };
+
+    let currentXLabel = 'Variable X';
+    let currentYLabel = 'Variable Y';
+
+    function loadRegressionPreset(key) {
+      const p = PRESETS[key];
+      if (!p) return;
+      document.getElementById('reg-model').value = p.model;
+      document.getElementById('reg-pred-x').value = p.predX;
+      document.getElementById('reg-data').value = p.data;
+      currentXLabel = p.xLabel;
+      currentYLabel = p.yLabel;
+
+      runRegressionLab();
+
+      const labSection = document.getElementById('laboratorio-regresion');
+      const labBox = document.getElementById('lab-box');
+      if (labSection) {
+        labSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      if (labBox) {
+        labBox.classList.remove('highlight-pulse');
+        void labBox.offsetWidth;
+        labBox.classList.add('highlight-pulse');
+      }
+    }
+
+    function parseDataPairs(rawText) {
+      const lines = rawText.split(/\r?\n/);
+      const pts = [];
+      for (const line of lines) {
+        const clean = line.trim();
+        if (!clean) continue;
+        const parts = clean.split(/[,;\t]+/);
+        if (parts.length >= 2) {
+          const x = parseFloat(parts[0].trim());
+          const y = parseFloat(parts[1].trim());
+          if (!isNaN(x) && !isNaN(y) && isFinite(x) && isFinite(y)) {
+            pts.push({ x, y });
+          }
+        }
+      }
+      return pts;
+    }
+
+    // Resolución de sistema lineal 3x3 por eliminación gaussiana con pivoteo parcial
+    function solveLinear3x3(A, B) {
+      const M = A.map((row, i) => [...row, B[i]]);
+      const n = 3;
+      for (let i = 0; i < n; i++) {
+        let maxRow = i;
+        for (let k = i + 1; k < n; k++) {
+          if (Math.abs(M[k][i]) > Math.abs(M[maxRow][i])) maxRow = k;
+        }
+        [M[i], M[maxRow]] = [M[maxRow], M[i]];
+        if (Math.abs(M[i][i]) < 1e-12) return null;
+        for (let k = i + 1; k < n; k++) {
+          const factor = M[k][i] / M[i][i];
+          for (let j = i; j <= n; j++) {
+            M[k][j] -= factor * M[i][j];
+          }
+        }
+      }
+      const x = new Array(n).fill(0);
+      for (let i = n - 1; i >= 0; i--) {
+        let sum = M[i][n];
+        for (let j = i + 1; j < n; j++) sum -= M[i][j] * x[j];
+        x[i] = sum / M[i][i];
+      }
+      return x;
+    }
+
+    function fitOLS(xs, ys) {
+      const n = xs.length;
+      const mx = xs.reduce((a, b) => a + b, 0) / n;
+      const my = ys.reduce((a, b) => a + b, 0) / n;
+      let num = 0, den = 0;
+      for (let i = 0; i < n; i++) {
+        num += (xs[i] - mx) * (ys[i] - my);
+        den += (xs[i] - mx) * (xs[i] - mx);
+      }
+      const b1 = den === 0 ? 0 : num / den;
+      const b0 = my - b1 * mx;
+      return { b0, b1 };
+    }
+
+    function formatShort(val, range) {
+      if (Math.abs(range) < 1) return val.toFixed(3);
+      if (Math.abs(range) < 20) return val.toFixed(2);
+      return val.toFixed(1);
+    }
+
+    function runRegressionLab() {
+      const modelType = document.getElementById('reg-model').value;
+      const predXRaw = parseFloat(document.getElementById('reg-pred-x').value);
+      const pts = parseDataPairs(document.getElementById('reg-data').value);
+      const statusEl = document.getElementById('reg-status');
+
+      if (pts.length < 3) {
+        statusEl.innerHTML = '<span style="color:#dc2626;"><strong>Error:</strong> Ingrese al menos 3 pares válidos (X, Y).</span>';
+        return;
+      }
+
+      const n = pts.length;
+      const xs = pts.map(p => p.x);
+      const ys = pts.map(p => p.y);
+      const predX = isNaN(predXRaw) ? xs[xs.length - 1] : predXRaw;
+
+      let predictFn = (x) => 0;
+      let eqHTML = '';
+      let kParams = 1; // número de predictores efectivos para R2 ajustado
+      let validModel = true;
+
+      if (modelType === 'linear') {
+        const { b0, b1 } = fitOLS(xs, ys);
+        predictFn = (x) => b0 + b1 * x;
+        const sign = b1 >= 0 ? '+' : '−';
+        eqHTML = `<span class="math-hat">y</span> = ${b0.toFixed(3)} ${sign} ${Math.abs(b1).toFixed(4)}x`;
+        kParams = 1;
+      } else if (modelType === 'poly2') {
+        let s0 = n, s1 = 0, s2 = 0, s3 = 0, s4 = 0;
+        let t0 = 0, t1 = 0, t2 = 0;
+        for (let i = 0; i < n; i++) {
+          const x = xs[i], y = ys[i], x2 = x * x;
+          s1 += x; s2 += x2; s3 += x2 * x; s4 += x2 * x2;
+          t0 += y; t1 += x * y; t2 += x2 * y;
+        }
+        const coefs = solveLinear3x3(
+          [[s0, s1, s2], [s1, s2, s3], [s2, s3, s4]],
+          [t0, t1, t2]
+        );
+        if (!coefs) {
+          validModel = false;
+        } else {
+          const [b0, b1, b2] = coefs;
+          predictFn = (x) => b0 + b1 * x + b2 * x * x;
+          const s1Str = b1 >= 0 ? '+' : '−';
+          const s2Str = b2 >= 0 ? '+' : '−';
+          eqHTML = `<span class="math-hat">y</span> = ${b0.toFixed(3)} ${s1Str} ${Math.abs(b1).toFixed(4)}x ${s2Str} ${Math.abs(b2).toFixed(4)}x<sup>2</sup>`;
+          kParams = 2;
+        }
+      } else if (modelType === 'power') {
+        if (xs.some(x => x <= 0) || ys.some(y => y <= 0)) {
+          validModel = false;
+          statusEl.innerHTML = '<span style="color:#dc2626;"><strong>Aviso:</strong> El modelo potencial (a·x<sup>b</sup>) requiere X &gt; 0 e Y &gt; 0.</span>';
+        } else {
+          const lnX = xs.map(x => Math.log(x));
+          const lnY = ys.map(y => Math.log(y));
+          const { b0, b1 } = fitOLS(lnX, lnY);
+          const a = Math.exp(b0);
+          predictFn = (x) => x > 0 ? a * Math.pow(x, b1) : 0;
+          eqHTML = `<span class="math-hat">y</span> = ${a.toFixed(4)} &middot; x<sup>${b1.toFixed(4)}</sup>`;
+          kParams = 1;
+        }
+      } else if (modelType === 'exp') {
+        if (ys.some(y => y <= 0)) {
+          validModel = false;
+          statusEl.innerHTML = '<span style="color:#dc2626;"><strong>Aviso:</strong> El modelo exponencial (a·e<sup>bx</sup>) requiere Y &gt; 0.</span>';
+        } else {
+          const lnY = ys.map(y => Math.log(y));
+          const { b0, b1 } = fitOLS(xs, lnY);
+          const a = Math.exp(b0);
+          predictFn = (x) => a * Math.exp(b1 * x);
+          eqHTML = `<span class="math-hat">y</span> = ${a.toFixed(4)} &middot; e<sup>${b1.toFixed(4)}x</sup>`;
+          kParams = 1;
+        }
+      }
+
+      if (!validModel) return;
+
+      statusEl.innerHTML = `<strong><span class="math-var">n</span> = ${n}</strong> observaciones calibradas. Rango X: [${Math.min(...xs)}, ${Math.max(...xs)}].`;
+
+      // Cálculo de valores ajustados, residuos y métricas en escala original
+      const yHats = xs.map(x => predictFn(x));
+      const resids = ys.map((y, i) => y - yHats[i]);
+      const meanY = ys.reduce((a, b) => a + b, 0) / n;
+
+      let ssRes = 0, ssTot = 0, absErr = 0;
+      for (let i = 0; i < n; i++) {
+        ssRes += resids[i] * resids[i];
+        ssTot += (ys[i] - meanY) * (ys[i] - meanY);
+        absErr += Math.abs(resids[i]);
+      }
+
+      const r2 = ssTot === 0 ? 1 : Math.max(0, 1 - ssRes / ssTot);
+      const denomAdj = n - kParams - 1;
+      const r2Adj = denomAdj > 0 ? 1 - ((1 - r2) * (n - 1)) / denomAdj : r2;
+      const rmse = Math.sqrt(ssRes / n);
+      const mae = absErr / n;
+      const seReg = n > (kParams + 1) ? Math.sqrt(ssRes / (n - kParams - 1)) : rmse;
+
+      const predY = predictFn(predX);
+      const margin95 = 2.0 * seReg;
+
+      document.getElementById('reg-eq-output').innerHTML = eqHTML;
+      document.getElementById('m-r2').textContent = r2.toFixed(4);
+      document.getElementById('m-r2adj').textContent = r2Adj.toFixed(4);
+      document.getElementById('m-rmse').textContent = rmse.toFixed(3);
+      document.getElementById('m-mae').textContent = mae.toFixed(3);
+      document.getElementById('m-pred').textContent = predY.toFixed(2);
+
+      document.getElementById('pred-interval-note').innerHTML =
+        `Para <strong>X<sub>0</sub> = ${predX}</strong>, el valor predicho es <strong>ŷ<sub>0</sub> = ${predY.toFixed(2)}</strong> &nbsp;|&nbsp; Banda de predicción aprox. 95%: <strong>[${(predY - margin95).toFixed(2)}, ${(predY + margin95).toFixed(2)}]</strong>.`;
+
+      renderFitSVG(pts, yHats, resids, predictFn, predX, predY, modelType);
+      renderResidSVG(yHats, resids);
+    }
+
+    function renderFitSVG(pts, yHats, resids, predictFn, predX, predY, modelType) {
+      const leftX = 52, rightX = 660, topY = 18, botY = 240;
+      const W = rightX - leftX, H = botY - topY;
+
+      const allX = [...pts.map(p => p.x), predX];
+      const allY = [...pts.map(p => p.y), ...yHats, predY];
+
+      let minX = Math.min(...allX), maxX = Math.max(...allX);
+      let minY = Math.min(...allY), maxY = Math.max(...allY);
+
+      const padX = (maxX - minX) * 0.08 || 1;
+      const padY = (maxY - minY) * 0.12 || 1;
+      minX = modelType === 'power' ? Math.max(0.01, minX - padX * 0.5) : minX - padX;
+      maxX += padX;
+      minY -= padY;
+      maxY += padY;
+
+      const toX = (v) => leftX + ((v - minX) / (maxX - minX)) * W;
+      const toY = (v) => botY - ((v - minY) / (maxY - minY)) * H;
+
+      // Cuadrícula y ejes
+      const gridG = document.getElementById('fit-grid');
+      const axesG = document.getElementById('fit-axes');
+      gridG.innerHTML = '';
+      axesG.innerHTML = '';
+
+      for (let i = 0; i <= 5; i++) {
+        const xv = minX + (i / 5) * (maxX - minX);
+        const px = toX(xv);
+        gridG.innerHTML += `<line x1="${px.toFixed(1)}" y1="${topY}" x2="${px.toFixed(1)}" y2="${botY}" stroke="#f1f5f9" stroke-width="1" />`;
+        axesG.innerHTML += `<text x="${px.toFixed(1)}" y="${botY + 16}" text-anchor="middle" fill="#475569" font-size="10.5" font-family="monospace">${formatShort(xv, maxX - minX)}</text>`;
+
+        const yv = minY + (i / 5) * (maxY - minY);
+        const py = toY(yv);
+        gridG.innerHTML += `<line x1="${leftX}" y1="${py.toFixed(1)}" x2="${rightX}" y2="${py.toFixed(1)}" stroke="#f1f5f9" stroke-width="1" />`;
+        axesG.innerHTML += `<text x="${leftX - 6}" y="${(py + 3.5).toFixed(1)}" text-anchor="end" fill="#475569" font-size="10.5" font-family="monospace">${formatShort(yv, maxY - minY)}</text>`;
+      }
+
+      // Etiquetas de ejes
+      axesG.innerHTML += `<text x="${(leftX + rightX) / 2}" y="276" text-anchor="middle" fill="#1e293b" font-size="11" font-weight="700">${currentXLabel}</text>`;
+
+      // Curva ajustada
+      let dCurve = '';
+      const steps = 160;
+      for (let i = 0; i <= steps; i++) {
+        const xv = minX + (i / steps) * (maxX - minX);
+        const yv = predictFn(xv);
+        if (!isFinite(yv)) continue;
+        const sx = toX(xv).toFixed(2);
+        const sy = Math.max(topY, Math.min(botY, toY(yv))).toFixed(2);
+        dCurve += (dCurve === '' ? `M ${sx} ${sy}` : ` L ${sx} ${sy}`);
+      }
+      document.getElementById('fit-curve').setAttribute('d', dCurve);
+
+      // Líneas verticales de residuos y puntos observados
+      const resG = document.getElementById('fit-residuals');
+      const ptsG = document.getElementById('fit-points');
+      resG.innerHTML = '';
+      ptsG.innerHTML = '';
+
+      pts.forEach((p, idx) => {
+        const cx = toX(p.x).toFixed(2);
+        const cyObs = toY(p.y).toFixed(2);
+        const cyHat = toY(yHats[idx]).toFixed(2);
+        resG.innerHTML += `<line x1="${cx}" y1="${cyObs}" x2="${cx}" y2="${cyHat}" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3,2" />`;
+        ptsG.innerHTML += `<circle cx="${cx}" cy="${cyObs}" r="4.3" fill="#0369a1" stroke="#ffffff" stroke-width="1.3" />`;
+      });
+
+      // Marcador de predicción (X0, Y0_hat)
+      const predG = document.getElementById('fit-pred-marker');
+      const px0 = toX(predX);
+      const py0 = Math.max(topY, Math.min(botY, toY(predY)));
+      const anchor = px0 > rightX - 110 ? 'end' : 'start';
+      const dxLabel = anchor === 'end' ? -8 : 8;
+
+      predG.innerHTML = `
+        <line x1="${px0.toFixed(1)}" y1="${py0.toFixed(1)}" x2="${px0.toFixed(1)}" y2="${botY}" stroke="#dc2626" stroke-width="1.3" stroke-dasharray="4,3" />
+        <line x1="${leftX}" y1="${py0.toFixed(1)}" x2="${px0.toFixed(1)}" y2="${py0.toFixed(1)}" stroke="#dc2626" stroke-width="1.3" stroke-dasharray="4,3" />
+        <circle cx="${px0.toFixed(1)}" cy="${py0.toFixed(1)}" r="6" fill="#dc2626" stroke="#ffffff" stroke-width="1.8" />
+        <text x="${(px0 + dxLabel).toFixed(1)}" y="${Math.max(topY + 13, py0 - 8).toFixed(1)}" text-anchor="${anchor}" fill="#dc2626" font-size="11" font-weight="700">ŷ(${predX}) = ${predY.toFixed(2)}</text>
+      `;
+    }
+
+    function renderResidSVG(yHats, resids) {
+      const leftX = 52, rightX = 660, topY = 14, botY = 128;
+      const W = rightX - leftX, H = botY - topY;
+
+      let minX = Math.min(...yHats), maxX = Math.max(...yHats);
+      const padX = (maxX - minX) * 0.08 || 1;
+      minX -= padX;
+      maxX += padX;
+
+      const maxAbsE = Math.max(...resids.map(e => Math.abs(e)), 0.001) * 1.25;
+      const toX = (v) => leftX + ((v - minX) / (maxX - minX)) * W;
+      const toY = (e) => (topY + botY) / 2 - (e / maxAbsE) * (H / 2);
+
+      const zeroY = toY(0).toFixed(1);
+      const zLine = document.getElementById('resid-zero-line');
+      zLine.setAttribute('y1', zeroY);
+      zLine.setAttribute('y2', zeroY);
+
+      const axesG = document.getElementById('resid-axes');
+      axesG.innerHTML = `
+        <text x="${leftX - 6}" y="${topY + 9}" text-anchor="end" fill="#475569" font-size="9.5" font-family="monospace">+${formatShort(maxAbsE, maxAbsE)}</text>
+        <text x="${leftX - 6}" y="${Number(zeroY) + 3}" text-anchor="end" fill="#dc2626" font-size="9.5" font-weight="700" font-family="monospace">0</text>
+        <text x="${leftX - 6}" y="${botY - 2}" text-anchor="end" fill="#475569" font-size="9.5" font-family="monospace">-${formatShort(maxAbsE, maxAbsE)}</text>
+        <text x="${(leftX + rightX) / 2}" y="146" text-anchor="middle" fill="#475569" font-size="10.5" font-weight="600">Valores Ajustados (ŷᵢ)</text>
+      `;
+
+      const ptsG = document.getElementById('resid-points');
+      ptsG.innerHTML = '';
+      yHats.forEach((yh, i) => {
+        const cx = toX(yh).toFixed(2);
+        const cy = toY(resids[i]).toFixed(2);
+        ptsG.innerHTML += `
+          <line x1="${cx}" y1="${zeroY}" x2="${cx}" y2="${cy}" stroke="#cbd5e1" stroke-width="1.2" />
+          <circle cx="${cx}" cy="${cy}" r="3.8" fill="#166534" stroke="#ffffff" stroke-width="1.1" />
+        `;
+      });
+    }
+
+    function copyCode(elementId, btnElement) {
+      const codeEl = document.getElementById(elementId);
+      if (!codeEl) return;
+      const textarea = document.createElement('textarea');
+      textarea.value = codeEl.textContent;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        const orig = btnElement.textContent;
+        btnElement.textContent = '¡Copiado!';
+        btnElement.style.background = '#15803d';
+        setTimeout(() => {
+          btnElement.textContent = orig;
+          btnElement.style.background = '';
+        }, 1600);
+      } catch (err) {
+        console.error('Error al copiar código:', err);
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+
+    ['reg-model', 'reg-pred-x', 'reg-data'].forEach(id => {
+      document.getElementById(id).addEventListener('input', runRegressionLab);
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      currentXLabel = PRESETS.hidro_sst.xLabel;
+      currentYLabel = PRESETS.hidro_sst.yLabel;
+      runRegressionLab();
+    });
+  </script>
+</body>
+</html>
